@@ -14,7 +14,7 @@ reweighter::reweighter(double E, int Z, int N, ffModel thisMod, char * input_uTy
 
   uType_fin=input_uType_fin;
   gcf_config_fin = new gcfSRC(Z_nuc,N_nuc,uType_fin);
-  sigma_cm_fin = 0.1;
+  sigma_cm_fin = 0.18;
   CS_config_fin = new eNCrossSection(cc1,thisMod);
   /*
   double P_new[4][2] = {{10,10},
@@ -32,9 +32,63 @@ reweighter::reweighter(double E, int Z, int N, ffModel thisMod, char * input_uTy
   TNN = 0.44;  
 }
 
+reweighter::reweighter(double E, int Z, int N, ffModel thisMod, char * input_uType_fin, double sigmaCM)
+{
+  Ebeam = E;
+  
+  Z_nuc = Z;
+  N_nuc = N;
+
+  uType_init="AV18";
+  gcf_config_init = new gcfSRC(2,2,uType_init);
+  sigma_cm_init = 0.2;
+  CS_config_init = new eNCrossSection(cc1,kelly);
+
+  uType_fin=input_uType_fin;
+  gcf_config_fin = new gcfSRC(Z_nuc,N_nuc,uType_fin);
+  sigma_cm_fin = sigmaCM;
+  CS_config_fin = new eNCrossSection(cc1,thisMod);
+  /*
+  double P_new[4][2] = {{10,10},
+			{10,10},
+			{10,10},
+			{10,10}};
+  */ 
+ 
+  double P_new[4][2] = {{4.1,3.5},
+			{4.8,4.1},
+			{4.8,4.1},
+			{4.1,3.5}};
+  memcpy(P,P_new,sizeof(P));
+  TN = 0.53;
+  TNN = 0.44;  
+}
+
+
 reweighter::~reweighter()
 {
 }
+
+void  reweighter::randomize_Config(){
+  TRandom3 * myRand = new TRandom3(0);
+  double s_Cpp0=gcf_config_fin->get_d_Cpp0()/gcf_config_fin->get_Cpp0();
+  double s_Cpn0=gcf_config_fin->get_d_Cpn0()/gcf_config_fin->get_Cpn0();
+  double s_Cnn0=gcf_config_fin->get_d_Cnn0()/gcf_config_fin->get_Cnn0();
+  double s_Cpn1=gcf_config_fin->get_d_Cpn1()/gcf_config_fin->get_Cpn1();
+  gcf_config_fin->set_Cpp0(gcf_config_fin->get_Cpp0()*myRand->Gaus(1.0,s_Cpp0));
+  gcf_config_fin->set_Cpn0(gcf_config_fin->get_Cpn0()*myRand->Gaus(1.0,s_Cpn0));
+  gcf_config_fin->set_Cnn0(gcf_config_fin->get_Cnn0()*myRand->Gaus(1.0,s_Cnn0));
+  gcf_config_fin->set_Cpn1(gcf_config_fin->get_Cpn1()*myRand->Gaus(1.0,s_Cpn1));
+  sigma_cm_fin*=myRand->Gaus(1.0,0.07);
+  for(int j = 0; j < 4; j++){
+    for(int k = 0; k < 2; k++){
+      P[j][k]*=myRand->Gaus(1.0,0.1*P[j][k]);
+    }	
+  }
+  TN*=myRand->Gaus(1.0,0.1);
+  TNN*=myRand->Gaus(1.0,0.1);
+}
+
 
 double reweighter::get_weight_noT(clas12::mcparticle* mcInfo)
 {

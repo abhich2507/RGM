@@ -23,8 +23,10 @@ class reweighter
 {
 public:
   reweighter(double E, int Z, int N, ffModel thisMod, char * input_uType_fin);
+  reweighter(double E, int Z, int N, ffModel thisMod, char * input_uType_fin, double sigmaCM);
   ~reweighter();
   
+  void randomize_Config();
   double get_weight_noT(clas12::mcparticle* mcInfo);
   double get_weight_ep(clas12::mcparticle* mcInfo);
   double get_weight_epp(clas12::mcparticle* mcInfo);
