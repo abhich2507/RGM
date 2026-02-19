@@ -1,0 +1,205 @@
+# Q2_Ana - Q² Dependence Analysis Module
+
+## Overview
+The **Q2_Ana** directory contains comprehensive analysis code for studying **quasi-elastic (QE) scattering** with a focus on Q² (4-momentum transfer squared) dependence in CLAS12 experimental data. This module processes HIPO format detector data and performs kinematic reconstruction, particle identification, and systematic studies for electron-proton (ep) and electron-proton-proton (epp) reactions.
+
+## Physics Context
+- **Q²**: The negative of the 4-momentum transfer squared, a key variable in deep inelastic and quasi-elastic scattering
+- **Beam Energy**: 5.98636 GeV (CLAS12 experiment)
+- **Primary Reactions**:
+  - Single nucleon knockout: e + A → e' + p + (A-1)
+  - Two-nucleon SRC: e + A → e' + p + p + (A-2)
+- **Binning**: Q² is binned in 10 ranges from 1.5 to 5.0 GeV²
+
+## Directory Contents
+
+### Core Analysis Programs
+
+#### Main Analysis Files
+- **`Analysis_Note_Q2.cpp`** (911 lines)
+  - Primary analysis code for Q² dependence studies
+  - Handles both single-nucleon ejection (ep) and two-nucleon SRC (epp) events
+  - Applies particle identification cuts, kinematic reconstruction
+  - Implements Q² and missing momentum binning
+  - Outputs ROOT histograms and PDF plots
+
+- **`Analysis_Note_Q2_comp.cpp`**
+  - Comparison version of the main analysis
+  - Likely used for systematic comparisons or data vs. MC studies
+
+- **`Analysis_Note_Q2_manyTheory.cpp`**
+  - Extended analysis comparing with multiple theoretical models
+  - Studies different theoretical predictions for Q² dependence
+
+#### Kinematic Analysis
+- **`Q2_dependence.cpp`** (492 lines)
+  - Specialized code for isolating and studying Q² dependence
+  - Implements binning: pmiss (0.4-1.0 GeV/c) and Q² (1.5-5.0 GeV²)
+  - Produces Q²-dependent cross sections and ratios
+
+- **`ep_Kinematics.cpp`**
+  - Electron-proton kinematics reconstruction
+  - Single nucleon ejection channel
+
+- **`epp_Kinematics.cpp`**
+  - Electron-proton-proton kinematics reconstruction
+  - Short-range correlations (SRC) channel with two ejected nucleons
+
+#### Particle Identification & Cuts
+- **`Electron_Cuts.cpp`** (392 lines)
+  - Selection criteria for electron identification
+  - Fiducial volume, momentum, and energy loss cuts
+  - Validation plots for electron PID
+
+- **`Proton_Cuts.cpp`** (520 lines)
+  - Proton identification and selection
+  - Includes central detector (CD) fiducial cuts:
+    - Phi-sector-based fiducial regions
+    - Momentum-dependent thresholds (fiducial_momT_start = 0.15 GeV/c)
+    - Theta acceptance windows (40° - 125°)
+
+- **`SRC_Cuts.cpp`**
+  - Specific cuts for two-nucleon SRC selection
+  - Likely includes high relative momentum requirements
+
+#### Specialized Studies
+- **`Main_Figs.cpp`** (580 lines)
+  - Generates publication-quality figures
+  - Multi-channel comparisons
+  - Implements binning arrays:
+    - Q² edges: {1.5, 1.65, 1.80, 1.95, 2.10, 2.25, 2.40, 2.70, 3.00, 3.50, 5.0}
+    - pmiss edges: {0.4, 0.5, 0.6, 0.75, 1.0}
+    - kmiss edges: {0.2, 0.35, 0.45, 0.6, 0.85}
+
+- **`KMiss.cpp`**
+  - Missing energy/momentum analysis
+  - Probes binding energy and removal energy distributions
+
+- **`KMiss_comparison_plot.cpp`**
+  - Comparative visualization of missing momentum
+
+- **`Electron_DeltaE.cpp`**
+  - Electron energy loss studies
+  - Detector response characterization
+
+- **`Radiation_Offset.cpp`**
+  - Radiative corrections and QED effects
+  - Important for precision analysis
+
+- **`Central_Detector_Proton.cpp`**
+  - Specific proton studies in central detector
+  - Complement to forward detector analysis
+
+#### Auxiliary Analysis
+- **`Andrew_skim.cpp`**
+  - Data skimming/reduction program
+  - Likely filters raw HIPO data for specific event topologies
+
+- **`p_LUND.cpp`**
+  - LUND format proton analysis
+  - May handle LUND-format MC or data representation
+
+- **`iso_p_LUND.cpp`**
+  - Isolated/isobaric proton analysis
+  - Studies specific nuclear configurations
+
+- **`many_plots.cpp` / `many_plots.h`** (58 lines)
+  - Shared utility library for histogram management
+  - Classes and methods:
+    - `Fill_hist_set()`: Populate histograms for ep/epp channels
+    - `Write_hist_set()` / `Write_hist_set_epp()`: Output histograms
+    - `Draw_hist_set_same()`: Overlay plots for comparison
+    - `getScale_*()`: Normalization factor calculations
+    - `binQ2()`: Q² binning function
+
+### Build Configuration
+- **`CMakeLists.txt`**
+  - CMake build configuration
+  - Compiles 10 primary executables:
+    - KMiss, Analysis_Note_Q2, Analysis_Note_Q2_comp, Analysis_Note_Q2_manyTheory
+    - KMiss_comparison_plot, p_LUND, Electron_DeltaE, Radiation_Offset
+    - Central_Detector_Proton, iso_p_LUND, Main_Figs
+  - Links against:
+    - ROOT libraries
+    - HiPo4 format libraries
+    - CLAS12 analysis libraries (Clas12Ana, Clas12Debug)
+    - Reweighting library
+    - Custom many_plots library
+
+- **`Makefile`** (generated by CMake)
+  - Standard CMake-generated makefile
+
+## Key Physics Parameters
+
+```
+Beam Energy:           5.98636 GeV
+Electron mass:         0.000511 GeV
+Nucleon mass (CODATA): 0.9314941024 GeV
+Deuteron mass:         1.8756 GeV
+He-4 mass:             4.00260325415 u - 2me
+
+Q² Bins (10 bins):
+  1.5-1.65, 1.65-1.80, 1.80-1.95, 1.95-2.10, 2.10-2.25,
+  2.25-2.40, 2.40-2.70, 2.70-3.00, 3.00-3.50, 3.50-5.00 GeV²
+
+Missing Momentum Bins (4 bins):
+  0.4-0.5, 0.5-0.6, 0.6-0.75, 0.75-1.0 GeV/c
+
+Missing Energy Bins (4 bins):
+  0.2-0.35, 0.35-0.45, 0.45-0.6, 0.6-0.85 GeV
+```
+
+## Dependencies
+- **ROOT** (CERN analysis framework)
+- **HiPo4** (CLAS12 data format library)
+- **CLAS12Banks** (Detector bank definitions)
+- **CLAS12Root** (ROOT interface to CLAS12 data)
+- **Clas12Ana** (Custom CLAS12 analysis library)
+- **Clas12Debug** (Debugging utilities)
+- **reweighter** (MC reweighting library)
+- **EG** (ROOT event generator library)
+
+## Typical Workflow
+
+1. **Data Input**: HIPO format files from CLAS12 detector
+2. **Event Selection**: Apply particle ID cuts (Electron_Cuts, Proton_Cuts, SRC_Cuts)
+3. **Kinematic Reconstruction**: Compute 4-vectors, Q², missing momentum/energy
+4. **Binning**: Sort events into Q² and pmiss bins
+5. **Histogram Filling**: Populate distributions via many_plots utility
+6. **Analysis**: 
+   - Study Q² dependence
+   - Compare ep vs. epp channels
+   - Validate against theoretical predictions
+7. **Output**: ROOT files with histograms, PDF plots for publication
+
+## Usage Example
+
+Typical command line usage (see Analysis_Note_Q2.cpp):
+```bash
+./Analysis_Note_Q2 <isMC> <A> <outputfile.root> <outputfile.pdf> <inputfiles.hipo> [inputfiles.hipo ...]
+```
+
+Parameters:
+- `isMC`: Flag (0 or 1) indicating Monte Carlo data
+- `A`: Nucleus mass number
+- `outputfile.root`: Output ROOT file for histograms
+- `outputfile.pdf`: Output PDF file for plots
+- `inputfiles.hipo`: Space-separated list of input HIPO data files
+
+## Related Directories
+- **`../proton_efficiency/`**: Proton detection efficiency studies
+- **`../Corrections/`**: Data correction procedures
+- **`../tensor_to_scalar/`**: Coordinate transformations
+- **`../../libraries/clas12ana/`**: Core analysis library
+- **`../../Monitoring/`**: Data quality monitoring
+
+## Notes
+- This analysis focuses on quasi-elastic scattering and short-range correlations
+- Heavy use of 4-momentum kinematics (TLorentzVector from ROOT)
+- Multiple binning schemes enable systematic variation studies
+- Both data and MC analysis capabilities included
+- Comparison with theoretical models (many_theory version)
+
+---
+
+*Q2_Ana is part of the RGM (Reaction Geometry Measurement?) project for CLAS12 physics analysis.*
